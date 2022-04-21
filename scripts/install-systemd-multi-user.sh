@@ -103,11 +103,13 @@ poly_configure_nix_daemon_service() {
              systemd-tmpfiles --create --prefix=/nix/var/nix
 
         _sudo "to set up the nix-daemon service" \
-              cat "/nix/var/nix/profiles/default$SERVICE_SRC" > "$SERVICE_DEST"
+              cp -L "/nix/var/nix/profiles/default$SERVICE_SRC" "$SERVICE_DEST"
 
         _sudo "to set up the nix-daemon socket service" \
-	      cat "/nix/var/nix/profiles/default$SOCKET_SRC" > "$SOCKET_DEST" \
-	      systemctl enable "$SOCKET_DEST"
+              cp -L "/nix/var/nix/profiles/default$SOCKET_SRC" "$SOCKET_DEST"
+
+        _sudo "to enable the nix-daemon socket service" \
+              systemctl enable "$SOCKET_DEST"
 
         handle_network_proxy
         execstart_systemd_override
