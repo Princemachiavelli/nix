@@ -5,7 +5,6 @@ set -o pipefail
 
 readonly SERVICE_SRC=/lib/systemd/system/nix-daemon.service
 readonly SERVICE_DEST=/etc/systemd/system/nix-daemon.service
-
 readonly SOCKET_SRC=/lib/systemd/system/nix-daemon.socket
 readonly SOCKET_DEST=/etc/systemd/system/nix-daemon.socket
 
@@ -15,12 +14,23 @@ readonly TMPFILES_DEST=/etc/tmpfiles.d/nix-daemon.conf
 # Path for the systemd override unit file to contain the proxy settings
 readonly SERVICE_OVERRIDE=${SERVICE_DEST}.d/override.conf
 
+# Path to Nix Profiles
+readonly PROFILE_DIR=/nix/var/nix/profiles/
+
 create_systemd_override() {
      header "Configuring proxy for the nix-daemon service"
     _sudo "create directory for systemd unit override" mkdir -p "$(dirname "$SERVICE_OVERRIDE")"
     cat <<EOF | _sudo "create systemd unit override" tee "$SERVICE_OVERRIDE"
 [Service]
 $1
+EOF
+}
+
+execstart_systemd_override() {
+     $profile="${1:-default}"
+     header "Configuring static execStart for the nix-daemon service"
+    cat <<EOF | _sudo "create systemd unit override" tee -a "$SERVICE_OVERRIDE"
+ExecStart=@${PROFILE_DIR}/${profile}/bin/nix-daemon nix-daemon --daemon
 EOF
 }
 
@@ -93,12 +103,14 @@ poly_configure_nix_daemon_service() {
              systemd-tmpfiles --create --prefix=/nix/var/nix
 
         _sudo "to set up the nix-daemon service" \
-              systemctl link "/nix/var/nix/profiles/default$SERVICE_SRC"
+              cat "/nix/var/nix/profiles/default$SERVICE_SRC" > "$SERVICE_DEST"
 
         _sudo "to set up the nix-daemon socket service" \
-              systemctl enable "/nix/var/nix/profiles/default$SOCKET_SRC"
+	      cat "/nix/var/nix/profiles/default$SOCKET_SRC" > "$SOCKET_DEST" \
+	      systemctl enable "$SOCKET_DEST"
 
         handle_network_proxy
+        execstart_systemd_override
 
         _sudo "to load the systemd unit for nix-daemon" \
               systemctl daemon-reload
