@@ -84,7 +84,10 @@ static void prim_fetchMercurial(EvalState & state, const PosIdx pos, Value * * a
 
 static RegisterPrimOp r_fetchMercurial({
     .name = "fetchMercurial",
-    .arity = 1,
+    .args = {"input"},
+    .doc = R"(
+      TODO: document builtin mercurial fetcher...
+    )",
     .fun = prim_fetchMercurial
 });
 

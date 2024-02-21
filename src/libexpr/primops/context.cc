@@ -14,7 +14,10 @@ static void prim_unsafeDiscardStringContext(EvalState & state, const PosIdx pos,
 
 static RegisterPrimOp primop_unsafeDiscardStringContext({
     .name = "__unsafeDiscardStringContext",
-    .arity = 1,
+    .args = {"s"},
+    .doc = R"(
+      Remove context from string *s*.
+    )",
     .fun = prim_unsafeDiscardStringContext
 });
 
@@ -316,8 +319,14 @@ static void prim_appendContext(EvalState & state, const PosIdx pos, Value * * ar
 
 static RegisterPrimOp primop_appendContext({
     .name = "__appendContext",
-    .arity = 2,
-    .fun = prim_appendContext
+    //.arity = 2,
+    .args = { "s", "c" },
+    .doc = R"(
+       Append the given context *c* to a given string *s*.
+       See the commentary above unsafeGetContext for details of the
+       context representation.
+    )",
+    .fun = prim_appendContext,
 });
 
 }

@@ -241,6 +241,12 @@ static void import(EvalState & state, const PosIdx pos, Value & vPath, Value * v
 static RegisterPrimOp primop_scopedImport(PrimOp {
     .name = "scopedImport",
     .arity = 2,
+    .doc = R"(
+      TODO ‘scopedImport’ works like ‘import’, except that it takes a set of
+      attributes to be added to the lexical scope of the expression,
+      essentially extending or overriding the builtin variables.  For
+      instance, the expression...
+    )",
     .fun = [](EvalState & state, const PosIdx pos, Value * * args, Value & v)
     {
         import(state, pos, *args[1], args[0], v);
@@ -833,7 +839,10 @@ static void prim_addErrorContext(EvalState & state, const PosIdx pos, Value * * 
 
 static RegisterPrimOp primop_addErrorContext(PrimOp {
     .name = "__addErrorContext",
-    .arity = 2,
+    .args = {"s", "e"},
+    .doc = R"(
+        Add a string *s* to stack traces at the evaluation of *e*.
+    )",
     .fun = prim_addErrorContext,
 });
 
@@ -1430,7 +1439,10 @@ drvName, Bindings * attrs, Value & v)
 
 static RegisterPrimOp primop_derivationStrict(PrimOp {
     .name = "derivationStrict",
-    .arity = 1,
+    .args = {"a"},
+    .doc = R"(
+      TODO: Internal builtin to create derivition from attribute set *a*.
+    )",
     .fun = prim_derivationStrict,
 });
 
@@ -2520,7 +2532,10 @@ static void prim_unsafeGetAttrPos(EvalState & state, const PosIdx pos, Value * *
 
 static RegisterPrimOp primop_unsafeGetAttrPos(PrimOp {
     .name = "__unsafeGetAttrPos",
-    .arity = 2,
+    .args = { "a", "a1" },
+    .doc = R"(
+      TODO: Return position information of attribute/key a on a1, otherwise return null.
+    )",
     .fun = prim_unsafeGetAttrPos,
 });
 
