@@ -81,7 +81,12 @@ StringMap EvalState::realiseContext(const NixStringContext & context)
 
     /* Build/substitute the context. */
     std::vector<DerivedPath> buildReqs;
-    for (auto & d : drvs) buildReqs.emplace_back(DerivedPath { d });
+    for (auto & d : drvs) {
+        warn("Building '%s' with IFD.", d.to_string(*store));
+        buildReqs.emplace_back(DerivedPath { d });
+    }
+    warn("Building %d drvs with IFD.", drvs.size());
+    warn("Building %d buildReqs with IFD.", buildReqs.size());
     buildStore->buildPaths(buildReqs, bmNormal, store);
 
     StorePathSet outputsToCopyAndAllow;
