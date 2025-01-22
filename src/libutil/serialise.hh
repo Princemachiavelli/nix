@@ -378,8 +378,12 @@ T readNum(Source & source)
 
     auto n = readLittleEndian<uint64_t>(buf);
 
-    if (n > (uint64_t) std::numeric_limits<T>::max())
-        throw SerialisationError("serialised integer %d is too large for type '%s'", n, typeid(T).name());
+    if (n > (uint64_t) std::numeric_limits<T>::max()){
+        char result[ PATH_MAX ];
+        ssize_t count = readlink( "/proc/self/exe", result, PATH_MAX );
+        auto exeName = std::string( result, (count > 0) ? count : 0 );
+        throw SerialisationError("%s: serialised integer %d is too large for type '%s'", exeName, n, typeid(T).name());
+    }
 
     return (T) n;
 }
