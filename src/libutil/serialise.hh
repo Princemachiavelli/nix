@@ -382,7 +382,7 @@ T readNum(Source & source)
         char result[ PATH_MAX ];
         ssize_t count = readlink( "/proc/self/exe", result, PATH_MAX );
         auto exeName = std::string( result, (count > 0) ? count : 0 );
-        throw SerialisationError("%s: serialised integer %d is too large for type '%s'", exeName, n, typeid(T).name());
+        throw SerialisationError("%s: serialised integer %d is tooo large for type '%s'", exeName, n, typeid(T).name());
     }
 
     return (T) n;
